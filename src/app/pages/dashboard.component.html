@@ -1,0 +1,322 @@
+<nz-layout class="dashboard-layout">
+  <nz-header class="header">
+    <div class="header-content">
+      <div class="logo">
+        <span nz-icon nzType="gift" nzTheme="outline"></span>
+        Birthday Reminder
+      </div>
+      <div class="user-info">
+        @if (currentUser$ | async; as user) {
+          <span class="welcome-text"
+            >Welcome, {{ user.name || user.email }}!</span
+          >
+        }
+        <button nz-button nzType="link" (click)="logout()" class="logout-btn">
+          <span nz-icon nzType="logout"></span>
+          Logout
+        </button>
+      </div>
+    </div>
+  </nz-header>
+
+  <nz-content class="content">
+    <!-- Statistics Cards -->
+    <div class="stats-row" nz-row nzGutter="16">
+      <div nz-col nzSpan="6">
+        <nz-card>
+          <nz-statistic
+            nzTitle="Total Friends"
+            [nzValue]="totalFriends()"
+            [nzValueStyle]="{ color: '#1890ff' }"
+            nzPrefix="👥"
+          ></nz-statistic>
+        </nz-card>
+      </div>
+
+      <div nz-col nzSpan="6">
+        <nz-card>
+          <nz-statistic
+            nzTitle="Upcoming Birthdays"
+            [nzValue]="upcomingBirthdays()"
+            [nzValueStyle]="{ color: '#52c41a' }"
+            nzPrefix="🎂"
+          ></nz-statistic>
+        </nz-card>
+      </div>
+
+      <div nz-col nzSpan="6">
+        <nz-card>
+          @if (nextBirthdayComputed(); as next) {
+            <nz-statistic
+              nzTitle="Next Birthday"
+              [nzValue]="next.daysUntil"
+              nzSuffix="days"
+              [nzValueStyle]="{ color: '#722ed1' }"
+              nzPrefix="📅"
+            ></nz-statistic>
+            <div class="next-birthday-info">
+              {{ next.friend.name }} {{ next.friend.surname }}
+            </div>
+          } @else {
+            <nz-statistic
+              nzTitle="Next Birthday"
+              nzValue="No data"
+              [nzValueStyle]="{ color: '#999' }"
+              nzPrefix="📅"
+            ></nz-statistic>
+          }
+        </nz-card>
+      </div>
+
+      <div nz-col nzSpan="6">
+        <nz-card>
+          <nz-statistic
+            nzTitle="Today's Birthdays"
+            [nzValue]="todaysBirthdaysComputed().length"
+            [nzValueStyle]="{ color: '#eb2f96' }"
+            nzPrefix="🎉"
+          ></nz-statistic>
+        </nz-card>
+      </div>
+    </div>
+
+    <!-- Today's Birthdays Alert -->
+    @if (todaysBirthdaysComputed().length > 0) {
+      <nz-alert nzType="success" nzShowIcon class="birthday-alert">
+        <span *nzAlertContent>
+          🎉 Today's Birthdays:
+          @for (birthday of todaysBirthdaysComputed(); track birthday.id) {
+            <nz-tag nzColor="pink" class="birthday-tag">
+              {{ birthday.friend.name }} {{ birthday.friend.surname }} ({{
+                birthday.age
+              }}
+              years old)
+            </nz-tag>
+          }
+        </span>
+      </nz-alert>
+    }
+
+    <!-- Friends Table -->
+    <nz-card class="table-card">
+      <div class="table-header">
+        <h2>Friends List</h2>
+        <div class="table-actions">
+          <nz-input-group
+            nzSearch
+            [nzAddOnAfter]="suffixIconButton"
+            class="search-input"
+          >
+            <input
+              type="text"
+              nz-input
+              placeholder="Search friends..."
+              [ngModel]="searchQuery()"
+              (ngModelChange)="onSearch($event)"
+            />
+          </nz-input-group>
+          <ng-template #suffixIconButton>
+            <button nz-button nzType="primary" nzSearch>
+              <span nz-icon nzType="search"></span>
+            </button>
+          </ng-template>
+
+          <button nz-button nzType="primary" (click)="showAddModal()">
+            <span nz-icon nzType="plus"></span>
+            Add Friend
+          </button>
+        </div>
+      </div>
+
+      <nz-table
+        #basicTable
+        [nzData]="filteredFriends()"
+        [nzLoading]="loading()"
+        nzShowSizeChanger
+        [nzPageSize]="10"
+      >
+        <thead>
+          <tr>
+            <th
+              (click)="onSort('name')"
+              class="sortable-header"
+              [class.sorted]="sortField() === 'name'"
+            >
+              First Name
+              <span
+                nz-icon
+                [nzType]="
+                  sortField() === 'name'
+                    ? sortOrder() === 'asc'
+                      ? 'caret-up'
+                      : 'caret-down'
+                    : 'swap'
+                "
+              ></span>
+            </th>
+            <th
+              (click)="onSort('surname')"
+              class="sortable-header"
+              [class.sorted]="sortField() === 'surname'"
+            >
+              Last Name
+              <span
+                nz-icon
+                [nzType]="
+                  sortField() === 'surname'
+                    ? sortOrder() === 'asc'
+                      ? 'caret-up'
+                      : 'caret-down'
+                    : 'swap'
+                "
+              ></span>
+            </th>
+            <th
+              (click)="onSort('phone')"
+              class="sortable-header"
+              [class.sorted]="sortField() === 'phone'"
+            >
+              Phone
+              <span
+                nz-icon
+                [nzType]="
+                  sortField() === 'phone'
+                    ? sortOrder() === 'asc'
+                      ? 'caret-up'
+                      : 'caret-down'
+                    : 'swap'
+                "
+              ></span>
+            </th>
+            <th
+              (click)="onSort('city')"
+              class="sortable-header"
+              [class.sorted]="sortField() === 'city'"
+            >
+              City
+              <span
+                nz-icon
+                [nzType]="
+                  sortField() === 'city'
+                    ? sortOrder() === 'asc'
+                      ? 'caret-up'
+                      : 'caret-down'
+                    : 'swap'
+                "
+              ></span>
+            </th>
+            <th
+              (click)="onSort('birthday')"
+              class="sortable-header"
+              [class.sorted]="sortField() === 'birthday'"
+            >
+              Birthday
+              <span
+                nz-icon
+                [nzType]="
+                  sortField() === 'birthday'
+                    ? sortOrder() === 'asc'
+                      ? 'caret-up'
+                      : 'caret-down'
+                    : 'swap'
+                "
+              ></span>
+            </th>
+            <th>Age</th>
+            <th>Days Until Birthday</th>
+            <th nzWidth="150px">Actions</th>
+          </tr>
+        </thead>
+        <tbody>
+          @for (friend of basicTable.data; track friend.id) {
+            <tr>
+              <td>{{ friend.name }}</td>
+              <td>{{ friend.surname }}</td>
+              <td>{{ friend.phone }}</td>
+              <td>{{ friend.city }}</td>
+              <td>{{ formatDate(friend.birthday) }}</td>
+              <td>{{ calculateAge(friend.birthday) }}</td>
+              <td>
+                <nz-tag
+                  [nzColor]="
+                    getDaysUntilBirthday(friend.birthday) <= 7 ? 'red' : 'blue'
+                  "
+                >
+                  {{ getDaysUntilBirthday(friend.birthday) }} days
+                </nz-tag>
+              </td>
+              <td class="actions-cell">
+                <button
+                  nz-button
+                  nzType="link"
+                  nzSize="small"
+                  (click)="showEditModal(friend)"
+                  title="Edit"
+                >
+                  <span nz-icon nzType="edit"></span>
+                </button>
+                <button
+                  nz-button
+                  nzType="link"
+                  nzDanger
+                  nzSize="small"
+                  nz-popconfirm
+                  nzPopconfirmTitle="Are you sure you want to delete this friend?"
+                  (nzOnConfirm)="onDeleteFriend(friend)"
+                  title="Delete"
+                >
+                  <span nz-icon nzType="delete"></span>
+                </button>
+              </td>
+            </tr>
+          } @empty {
+            <tr>
+              <td colspan="8" class="no-data">
+                @if (searchQuery()) {
+                  No friends found matching "{{ searchQuery() }}"
+                } @else {
+                  No friends added yet. Click "Add Friend" to get started!
+                }
+              </td>
+            </tr>
+          }
+        </tbody>
+      </nz-table>
+    </nz-card>
+  </nz-content>
+</nz-layout>
+
+<!-- Add Friend Modal -->
+<nz-modal
+  [nzVisible]="isAddModalVisible()"
+  nzTitle="Add New Friend"
+  (nzOnCancel)="hideAddModal()"
+  [nzFooter]="null"
+  nzWidth="600px"
+>
+  <ng-container *nzModalContent>
+    <app-friend-form
+      [loading]="modalLoading()"
+      (save)="onSaveFriend($event)"
+      (cancel)="hideAddModal()"
+    ></app-friend-form>
+  </ng-container>
+</nz-modal>
+
+<!-- Edit Friend Modal -->
+<nz-modal
+  [nzVisible]="isEditModalVisible()"
+  nzTitle="Edit Friend"
+  (nzOnCancel)="hideEditModal()"
+  [nzFooter]="null"
+  nzWidth="600px"
+>
+  <ng-container *nzModalContent>
+    <app-friend-form
+      [friend]="editingFriend()"
+      [loading]="modalLoading()"
+      (save)="onUpdateFriend($event)"
+      (cancel)="hideEditModal()"
+    ></app-friend-form>
+  </ng-container>
+</nz-modal>

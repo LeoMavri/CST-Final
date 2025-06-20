@@ -6,7 +6,7 @@
   },
   "newProjectRoot": "projects",
   "projects": {
-    "music-manager": {
+    "birthday-reminder": {
       "projectType": "application",
       "schematics": {
         "@schematics/angular:component": {
@@ -42,7 +42,7 @@
         "build": {
           "builder": "@angular-devkit/build-angular:application",
           "options": {
-            "outputPath": "dist/music-manager",
+            "outputPath": "dist/birthday-reminder",
             "index": "src/index.html",
             "browser": "src/main.ts",
             "polyfills": ["zone.js"],
@@ -90,10 +90,10 @@
           "builder": "@angular-devkit/build-angular:dev-server",
           "configurations": {
             "production": {
-              "buildTarget": "music-manager:build:production"
+              "buildTarget": "birthday-reminder:build:production"
             },
             "development": {
-              "buildTarget": "music-manager:build:development"
+              "buildTarget": "birthday-reminder:build:development"
             }
           },
           "defaultConfiguration": "development"

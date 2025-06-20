@@ -1,14 +1,13 @@
-import { ChangeDetectionStrategy, Component } from '@angular/core';
-import { NgOptimizedImage } from '@angular/common';
+import { Component } from '@angular/core';
+import { RouterOutlet } from '@angular/router';
 
 @Component({
   selector: 'app-root',
   standalone: true,
-  imports: [NgOptimizedImage],
-  templateUrl: './app.component.html',
+  imports: [RouterOutlet],
+  template: '<router-outlet></router-outlet>',
   styleUrl: './app.component.scss',
-  changeDetection: ChangeDetectionStrategy.OnPush,
 })
 export class AppComponent {
-  title = 'horse-racer';
+  title = 'Birthday Reminder App';
 }

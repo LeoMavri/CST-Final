@@ -1,0 +1,37 @@
+.friend-form {
+  padding: 16px;
+}
+
+.form-actions {
+  margin-top: 24px;
+
+  .save-btn {
+    margin-right: 8px;
+  }
+
+  .cancel-btn {
+    margin-left: 8px;
+  }
+}
+
+.error-text {
+  color: #ff4d4f;
+  font-size: 12px;
+  margin-top: 4px;
+}
+
+.error {
+  border-color: #ff4d4f !important;
+}
+
+:host ::ng-deep {
+  .ant-form-item-label {
+    padding: 0;
+  }
+
+  .ant-picker {
+    &.error {
+      border-color: #ff4d4f !important;
+    }
+  }
+}

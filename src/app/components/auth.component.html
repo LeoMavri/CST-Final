@@ -1,0 +1,329 @@
+<div class="auth-container">
+  <nz-card class="auth-card">
+    <nz-tabset nzCentered>
+      <nz-tab nzTitle="Login">
+        <form
+          nz-form
+          [formGroup]="loginForm"
+          (ngSubmit)="onLogin()"
+          class="auth-form"
+        >
+          <nz-form-item>
+            <nz-form-label [nzSpan]="24" nzRequired>Email</nz-form-label>
+            <nz-form-control
+              [nzSpan]="24"
+              nzErrorTip="Please enter a valid email address"
+            >
+              <input
+                nz-input
+                formControlName="email"
+                type="email"
+                placeholder="Enter your email"
+                [class.error]="
+                  loginForm.get('email')?.invalid &&
+                  loginForm.get('email')?.touched
+                "
+              />
+            </nz-form-control>
+          </nz-form-item>
+
+          <nz-form-item>
+            <nz-form-label [nzSpan]="24" nzRequired>Password</nz-form-label>
+            <nz-form-control
+              [nzSpan]="24"
+              nzErrorTip="Please enter your password"
+            >
+              <nz-input-group [nzSuffix]="suffixTemplate">
+                <input
+                  [type]="passwordVisible() ? 'text' : 'password'"
+                  nz-input
+                  formControlName="password"
+                  placeholder="Enter your password"
+                  [class.error]="
+                    loginForm.get('password')?.invalid &&
+                    loginForm.get('password')?.touched
+                  "
+                />
+              </nz-input-group>
+              <ng-template #suffixTemplate>
+                <span
+                  nz-icon
+                  [nzType]="passwordVisible() ? 'eye-invisible' : 'eye'"
+                  (click)="togglePasswordVisibility()"
+                  class="password-toggle"
+                ></span>
+              </ng-template>
+            </nz-form-control>
+          </nz-form-item>
+
+          <nz-form-item>
+            <nz-form-control [nzSpan]="24">
+              <label nz-checkbox formControlName="rememberMe"
+                >Remember me</label
+              >
+            </nz-form-control>
+          </nz-form-item>
+
+          @if (error()) {
+            <nz-alert
+              nzType="error"
+              [nzMessage]="error()"
+              nzShowIcon
+              nzCloseable
+              (nzOnClose)="clearError()"
+              class="error-alert"
+            ></nz-alert>
+          }
+
+          <nz-form-item>
+            <nz-form-control [nzSpan]="24">
+              <button
+                nz-button
+                nzType="primary"
+                nzBlock
+                [nzLoading]="loading()"
+                [disabled]="loginForm.invalid"
+                type="submit"
+              >
+                Sign In
+              </button>
+            </nz-form-control>
+          </nz-form-item>
+        </form>
+      </nz-tab>
+
+      <nz-tab nzTitle="Register">
+        <form
+          nz-form
+          [formGroup]="registerForm"
+          (ngSubmit)="onRegister()"
+          class="auth-form"
+        >
+          <nz-form-item>
+            <nz-form-label [nzSpan]="24" nzRequired>Email</nz-form-label>
+            <nz-form-control
+              [nzSpan]="24"
+              nzErrorTip="Please enter a valid email address"
+            >
+              <input
+                nz-input
+                formControlName="email"
+                type="email"
+                placeholder="Enter your email"
+                [class.error]="
+                  registerForm.get('email')?.invalid &&
+                  registerForm.get('email')?.touched
+                "
+              />
+            </nz-form-control>
+          </nz-form-item>
+
+          <div nz-row nzGutter="8">
+            <div nz-col nzSpan="12">
+              <nz-form-item>
+                <nz-form-label [nzSpan]="24" nzRequired
+                  >First Name</nz-form-label
+                >
+                <nz-form-control
+                  [nzSpan]="24"
+                  nzErrorTip="Please enter your first name"
+                >
+                  <input
+                    nz-input
+                    formControlName="firstName"
+                    placeholder="First name"
+                    [class.error]="
+                      registerForm.get('firstName')?.invalid &&
+                      registerForm.get('firstName')?.touched
+                    "
+                  />
+                </nz-form-control>
+              </nz-form-item>
+            </div>
+            <div nz-col nzSpan="12">
+              <nz-form-item>
+                <nz-form-label [nzSpan]="24" nzRequired
+                  >Last Name</nz-form-label
+                >
+                <nz-form-control
+                  [nzSpan]="24"
+                  nzErrorTip="Please enter your last name"
+                >
+                  <input
+                    nz-input
+                    formControlName="lastName"
+                    placeholder="Last name"
+                    [class.error]="
+                      registerForm.get('lastName')?.invalid &&
+                      registerForm.get('lastName')?.touched
+                    "
+                  />
+                </nz-form-control>
+              </nz-form-item>
+            </div>
+          </div>
+
+          <nz-form-item>
+            <nz-form-label [nzSpan]="24" nzRequired>Password</nz-form-label>
+            <nz-form-control [nzSpan]="24">
+              <nz-input-group [nzSuffix]="suffixTemplate2">
+                <input
+                  [type]="passwordVisible() ? 'text' : 'password'"
+                  nz-input
+                  formControlName="password"
+                  placeholder="Enter your password"
+                  [class.error]="
+                    registerForm.get('password')?.invalid &&
+                    registerForm.get('password')?.touched
+                  "
+                />
+              </nz-input-group>
+              <ng-template #suffixTemplate2>
+                <span
+                  nz-icon
+                  [nzType]="passwordVisible() ? 'eye-invisible' : 'eye'"
+                  (click)="togglePasswordVisibility()"
+                  class="password-toggle"
+                ></span>
+              </ng-template>
+
+              @if (
+                registerForm.get('password')?.errors?.['passwordStrength'] &&
+                registerForm.get('password')?.touched
+              ) {
+                <div class="password-requirements">
+                  <div
+                    class="password-requirement"
+                    [class.valid]="
+                      registerForm.get('password')?.errors?.['passwordStrength']
+                        ?.isValidLength
+                    "
+                  >
+                    {{
+                      registerForm.get('password')?.errors?.['passwordStrength']
+                        ?.isValidLength
+                        ? '✓'
+                        : '✗'
+                    }}
+                    At least 6 characters
+                  </div>
+                  <div
+                    class="password-requirement"
+                    [class.valid]="
+                      registerForm.get('password')?.errors?.['passwordStrength']
+                        ?.hasUpperCase
+                    "
+                  >
+                    {{
+                      registerForm.get('password')?.errors?.['passwordStrength']
+                        ?.hasUpperCase
+                        ? '✓'
+                        : '✗'
+                    }}
+                    One uppercase letter
+                  </div>
+                  <div
+                    class="password-requirement"
+                    [class.valid]="
+                      registerForm.get('password')?.errors?.['passwordStrength']
+                        ?.hasLowerCase
+                    "
+                  >
+                    {{
+                      registerForm.get('password')?.errors?.['passwordStrength']
+                        ?.hasLowerCase
+                        ? '✓'
+                        : '✗'
+                    }}
+                    One lowercase letter
+                  </div>
+                  <div
+                    class="password-requirement"
+                    [class.valid]="
+                      registerForm.get('password')?.errors?.['passwordStrength']
+                        ?.hasNumeric
+                    "
+                  >
+                    {{
+                      registerForm.get('password')?.errors?.['passwordStrength']
+                        ?.hasNumeric
+                        ? '✓'
+                        : '✗'
+                    }}
+                    One number
+                  </div>
+                  <div
+                    class="password-requirement"
+                    [class.valid]="
+                      registerForm.get('password')?.errors?.['passwordStrength']
+                        ?.hasSpecialChar
+                    "
+                  >
+                    {{
+                      registerForm.get('password')?.errors?.['passwordStrength']
+                        ?.hasSpecialChar
+                        ? '✓'
+                        : '✗'
+                    }}
+                    One special character
+                  </div>
+                </div>
+              }
+            </nz-form-control>
+          </nz-form-item>
+
+          <nz-form-item>
+            <nz-form-label [nzSpan]="24" nzRequired
+              >Confirm Password</nz-form-label
+            >
+            <nz-form-control [nzSpan]="24">
+              <input
+                nz-input
+                formControlName="confirmPassword"
+                type="password"
+                placeholder="Confirm your password"
+                [class.error]="
+                  (registerForm.get('confirmPassword')?.invalid ||
+                    registerForm.errors?.['passwordMismatch']) &&
+                  registerForm.get('confirmPassword')?.touched
+                "
+              />
+              @if (
+                registerForm.errors?.['passwordMismatch'] &&
+                registerForm.get('confirmPassword')?.touched
+              ) {
+                <div class="error-text">Passwords do not match</div>
+              }
+            </nz-form-control>
+          </nz-form-item>
+
+          @if (error()) {
+            <nz-alert
+              nzType="error"
+              [nzMessage]="error()"
+              nzShowIcon
+              nzCloseable
+              (nzOnClose)="clearError()"
+              class="error-alert"
+            ></nz-alert>
+          }
+
+          <nz-form-item>
+            <nz-form-control [nzSpan]="24">
+              <button
+                nz-button
+                nzType="primary"
+                nzBlock
+                [nzLoading]="loading()"
+                [disabled]="registerForm.invalid"
+                type="submit"
+              >
+                Create Account
+              </button>
+            </nz-form-control>
+          </nz-form-item>
+        </form>
+      </nz-tab>
+    </nz-tabset>
+  </nz-card>
+</div>

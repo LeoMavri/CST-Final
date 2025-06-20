@@ -1,0 +1,130 @@
+<form
+  nz-form
+  [formGroup]="friendForm"
+  (ngSubmit)="onSubmit()"
+  class="friend-form"
+>
+  <div nz-row nzGutter="16">
+    <div nz-col nzSpan="12">
+      <nz-form-item>
+        <nz-form-label [nzSpan]="24" nzRequired>First Name</nz-form-label>
+        <nz-form-control
+          [nzSpan]="24"
+          nzErrorTip="Please enter a valid first name (min 2 characters)"
+        >
+          <input
+            nz-input
+            formControlName="name"
+            placeholder="Enter first name"
+            [class.error]="
+              friendForm.get('name')?.invalid && friendForm.get('name')?.touched
+            "
+          />
+        </nz-form-control>
+      </nz-form-item>
+    </div>
+
+    <div nz-col nzSpan="12">
+      <nz-form-item>
+        <nz-form-label [nzSpan]="24" nzRequired>Last Name</nz-form-label>
+        <nz-form-control
+          [nzSpan]="24"
+          nzErrorTip="Please enter a valid last name (min 2 characters)"
+        >
+          <input
+            nz-input
+            formControlName="surname"
+            placeholder="Enter last name"
+            [class.error]="
+              friendForm.get('surname')?.invalid &&
+              friendForm.get('surname')?.touched
+            "
+          />
+        </nz-form-control>
+      </nz-form-item>
+    </div>
+  </div>
+
+  <nz-form-item>
+    <nz-form-label [nzSpan]="24" nzRequired>Phone Number</nz-form-label>
+    <nz-form-control [nzSpan]="24">
+      <input
+        nz-input
+        formControlName="phone"
+        placeholder="Enter phone number (e.g., +1234567890)"
+        [class.error]="
+          friendForm.get('phone')?.invalid && friendForm.get('phone')?.touched
+        "
+      />
+      @if (
+        friendForm.get('phone')?.errors?.['invalidPhone'] &&
+        friendForm.get('phone')?.touched
+      ) {
+        <div class="error-text">Please enter a valid phone number</div>
+      }
+    </nz-form-control>
+  </nz-form-item>
+
+  <nz-form-item>
+    <nz-form-label [nzSpan]="24" nzRequired>City</nz-form-label>
+    <nz-form-control
+      [nzSpan]="24"
+      nzErrorTip="Please enter a valid city name (min 2 characters)"
+    >
+      <input
+        nz-input
+        formControlName="city"
+        placeholder="Enter city"
+        [class.error]="
+          friendForm.get('city')?.invalid && friendForm.get('city')?.touched
+        "
+      />
+    </nz-form-control>
+  </nz-form-item>
+
+  <nz-form-item>
+    <nz-form-label [nzSpan]="24" nzRequired>Birthday</nz-form-label>
+    <nz-form-control [nzSpan]="24">
+      <nz-date-picker
+        formControlName="birthday"
+        nzPlaceHolder="Select birthday"
+        [nzDisabledDate]="disabledDate"
+        style="width: 100%"
+        [class.error]="
+          friendForm.get('birthday')?.invalid &&
+          friendForm.get('birthday')?.touched
+        "
+      ></nz-date-picker>
+      @if (
+        friendForm.get('birthday')?.errors?.['futureDate'] &&
+        friendForm.get('birthday')?.touched
+      ) {
+        <div class="error-text">Birthday cannot be in the future</div>
+      }
+      @if (
+        friendForm.get('birthday')?.errors?.['tooOld'] &&
+        friendForm.get('birthday')?.touched
+      ) {
+        <div class="error-text">Please enter a valid birthdate</div>
+      }
+    </nz-form-control>
+  </nz-form-item>
+
+  <nz-form-item class="form-actions">
+    <nz-form-control [nzSpan]="24">
+      <button
+        nz-button
+        nzType="primary"
+        [nzLoading]="loading"
+        [disabled]="friendForm.invalid"
+        type="submit"
+        class="save-btn"
+      >
+        {{ isEditMode() ? 'Update Friend' : 'Add Friend' }}
+      </button>
+      <button nz-button type="button" (click)="onCancel()" class="cancel-btn">
+        Cancel
+      </button>
+    </nz-form-control>
+  </nz-form-item>
+</form>
