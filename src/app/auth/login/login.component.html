@@ -1,0 +1,105 @@
+<div class="login-container">
+  <nz-card class="login-card" nzTitle="Sign In" nzSize="default">
+    <!-- Error Alert -->
+    <nz-alert
+      *ngIf="error()"
+      nzType="error"
+      nzShowIcon
+      nzCloseable
+      class="error-alert"
+      [nzMessage]="error()"
+      (nzOnClose)="authService.clearError()"
+    >
+    </nz-alert>
+
+    <!-- Login Form -->
+    <form
+      nz-form
+      class="login-form"
+      [formGroup]="loginForm"
+      (ngSubmit)="onSubmit()"
+    >
+      <!-- Email Field -->
+      <nz-form-item>
+        <nz-form-label nzRequired nzFor="email">Email</nz-form-label>
+        <nz-form-control
+          [nzErrorTip]="getErrorMessage('email')"
+          [nzValidateStatus]="hasError('email') ? 'error' : ''"
+        >
+          <input
+            nz-input
+            formControlName="email"
+            id="email"
+            type="email"
+            placeholder="Enter your email"
+            [class.error-input]="hasError('email')"
+          />
+        </nz-form-control>
+      </nz-form-item>
+
+      <!-- Password Field -->
+      <nz-form-item>
+        <nz-form-label nzRequired nzFor="password">Password</nz-form-label>
+        <nz-form-control
+          [nzErrorTip]="getErrorMessage('password')"
+          [nzValidateStatus]="hasError('password') ? 'error' : ''"
+        >
+          <nz-input-group [nzSuffix]="suffixTemplate">
+            <input
+              nz-input
+              formControlName="password"
+              id="password"
+              placeholder="Enter your password"
+              [type]="passwordVisible() ? 'text' : 'password'"
+              [class.error-input]="hasError('password')"
+            />
+          </nz-input-group>
+          <ng-template #suffixTemplate>
+            <span
+              nz-icon
+              class="password-toggle"
+              [nzType]="passwordVisible() ? 'eye-invisible' : 'eye'"
+              (click)="togglePasswordVisibility()"
+            >
+            </span>
+          </ng-template>
+        </nz-form-control>
+      </nz-form-item>
+
+      <!-- Remember Me Checkbox -->
+      <nz-form-item>
+        <nz-form-control>
+          <label nz-checkbox formControlName="rememberMe"> Remember me </label>
+        </nz-form-control>
+      </nz-form-item>
+
+      <!-- Submit Button -->
+      <nz-form-item class="submit-button">
+        <nz-form-control>
+          <button
+            nz-button
+            nzType="primary"
+            nzSize="large"
+            type="submit"
+            nzBlock
+            [nzLoading]="isLoading()"
+            [disabled]="isLoading()"
+          >
+            <span *ngIf="!isLoading()">Sign In</span>
+            <span *ngIf="isLoading()">Signing In...</span>
+          </button>
+        </nz-form-control>
+      </nz-form-item>
+
+      <!-- Register Link -->
+      <nz-form-item class="register-link">
+        <nz-form-control>
+          <p>
+            Don't have an account?
+            <a class="link" (click)="goToRegister()">Create one</a>
+          </p>
+        </nz-form-control>
+      </nz-form-item>
+    </form>
+  </nz-card>
+</div>

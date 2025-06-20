@@ -1,0 +1,267 @@
+<nz-layout class="dashboard-layout">
+  <!-- Header -->
+  <nz-header class="header">
+    <div class="header-content">
+      <div class="logo">
+        <span nz-icon nzType="music" nzTheme="outline"></span>
+        <span class="logo-text">Music Playlist Manager</span>
+      </div>
+
+      <div class="user-menu">
+        <div
+          nz-dropdown
+          nzPlacement="bottomRight"
+          nzTrigger="click"
+          [nzDropdownMenu]="menu"
+        >
+          <div class="user-info">
+            <nz-avatar [nzSrc]="user()?.avatar" [nzSize]="32">
+              {{ user()?.first_name?.charAt(0)
+              }}{{ user()?.last_name?.charAt(0) }}
+            </nz-avatar>
+            <span class="user-name"
+              >{{ user()?.first_name }} {{ user()?.last_name }}</span
+            >
+            <span nz-icon nzType="down" nzTheme="outline"></span>
+          </div>
+        </div>
+        <nz-dropdown-menu #menu="nzDropdownMenu">
+          <ul nz-menu nzSelectable="false">
+            <li nz-menu-item (click)="goToProfile()">
+              <span nz-icon nzType="user" nzTheme="outline"></span>
+              Profile
+            </li>
+            <li nz-menu-divider></li>
+            <li nz-menu-item (click)="logout()">
+              <span nz-icon nzType="logout" nzTheme="outline"></span>
+              Logout
+            </li>
+          </ul>
+        </nz-dropdown-menu>
+      </div>
+    </div>
+  </nz-header>
+
+  <!-- Content -->
+  <nz-content class="content">
+    <div class="content-wrapper">
+      <!-- Stats Cards -->
+      <div class="stats-grid">
+        <nz-card class="stat-card">
+          <div class="stat-content">
+            <div class="stat-icon">
+              <span nz-icon nzType="unordered-list" nzTheme="outline"></span>
+            </div>
+            <div class="stat-details">
+              <h3>{{ stats().totalPlaylists }}</h3>
+              <p>Playlists</p>
+            </div>
+          </div>
+        </nz-card>
+
+        <nz-card class="stat-card">
+          <div class="stat-content">
+            <div class="stat-icon">
+              <span nz-icon nzType="sound" nzTheme="outline"></span>
+            </div>
+            <div class="stat-details">
+              <h3>{{ stats().totalTracks }}</h3>
+              <p>Songs</p>
+            </div>
+          </div>
+        </nz-card>
+
+        <nz-card class="stat-card">
+          <div class="stat-content">
+            <div class="stat-icon">
+              <span nz-icon nzType="heart" nzTheme="outline"></span>
+            </div>
+            <div class="stat-details">
+              <h3>{{ stats().favoriteCount }}</h3>
+              <p>Favorites</p>
+            </div>
+          </div>
+        </nz-card>
+
+        <nz-card class="stat-card">
+          <div class="stat-content">
+            <div class="stat-icon">
+              <span nz-icon nzType="clock-circle" nzTheme="outline"></span>
+            </div>
+            <div class="stat-details">
+              <h3>{{ formatDuration(stats().totalDuration) }}</h3>
+              <p>Total Time</p>
+            </div>
+          </div>
+        </nz-card>
+      </div>
+
+      <!-- Main Content Tabs -->
+      <nz-card class="main-content-card">
+        <nz-tabset
+          [nzSelectedIndex]="activeTab()"
+          (nzSelectedIndexChange)="switchToTab($event)"
+          nzSize="large"
+          nzType="card"
+        >
+          <!-- Dashboard Overview Tab -->
+          <nz-tab nzTitle="Overview">
+            <ng-template #nzTabHeading>
+              <span nz-icon nzType="dashboard" nzTheme="outline"></span>
+              Overview
+            </ng-template>
+
+            <div class="overview-content">
+              <!-- Recent Activity -->
+              <nz-card
+                nzTitle="Recent Activity"
+                class="recent-activity-section"
+              >
+                <div class="empty-state">
+                  <span
+                    nz-icon
+                    nzType="inbox"
+                    nzTheme="outline"
+                    class="empty-icon"
+                  ></span>
+                  <p>
+                    No recent activity yet. Start by creating your first
+                    playlist!
+                  </p>
+                </div>
+              </nz-card>
+
+              <!-- Quick Actions -->
+              <nz-card nzTitle="Quick Actions" class="quick-actions-section">
+                <div class="action-buttons">
+                  <button
+                    nz-button
+                    nzType="primary"
+                    nzSize="large"
+                    (click)="openCreatePlaylistModal()"
+                  >
+                    <span nz-icon nzType="plus" nzTheme="outline"></span>
+                    Create Playlist
+                  </button>
+                  <button
+                    nz-button
+                    nzType="default"
+                    nzSize="large"
+                    (click)="switchToTab(2)"
+                  >
+                    <span nz-icon nzType="search" nzTheme="outline"></span>
+                    Search Music
+                  </button>
+                  <button
+                    nz-button
+                    nzType="default"
+                    nzSize="large"
+                    (click)="switchToTab(1)"
+                  >
+                    <span
+                      nz-icon
+                      nzType="ordered-list"
+                      nzTheme="outline"
+                    ></span>
+                    Manage Playlists
+                  </button>
+                </div>
+              </nz-card>
+            </div>
+          </nz-tab>
+
+          <!-- Playlist Manager Tab -->
+          <nz-tab nzTitle="Playlists">
+            <ng-template #nzTabHeading>
+              <span nz-icon nzType="ordered-list" nzTheme="outline"></span>
+              Playlists
+            </ng-template>
+
+            <app-playlist-manager
+              [showOnlyPublic]="false"
+              (playlistSelected)="onPlaylistSelected($event)"
+              (playlistDeleted)="onPlaylistDeleted($event)"
+            >
+            </app-playlist-manager>
+          </nz-tab>
+
+          <!-- Music Search Tab -->
+          <nz-tab nzTitle="Search Music">
+            <ng-template #nzTabHeading>
+              <span nz-icon nzType="search" nzTheme="outline"></span>
+              Search Music
+            </ng-template>
+
+            <div class="music-search-container">
+              <app-music-search></app-music-search>
+            </div>
+          </nz-tab>
+        </nz-tabset>
+      </nz-card>
+    </div>
+  </nz-content>
+
+  <!-- Create Playlist Modal -->
+  <nz-modal
+    [(nzVisible)]="showCreatePlaylistModal"
+    nzTitle="Create New Playlist"
+    nzWidth="480px"
+    (nzOnCancel)="closeCreatePlaylistModal()"
+    (nzOnOk)="createPlaylist()"
+    nzOkText="Create Playlist"
+    nzCancelText="Cancel"
+  >
+    <div *nzModalContent>
+      <form
+        nz-form
+        [formGroup]="createPlaylistForm"
+        class="create-playlist-form"
+      >
+        <!-- Playlist Name -->
+        <nz-form-item>
+          <nz-form-label nzRequired nzFor="name">Playlist Name</nz-form-label>
+          <nz-form-control
+            [nzErrorTip]="getErrorMessage('name')"
+            [nzValidateStatus]="hasError('name') ? 'error' : ''"
+          >
+            <input
+              nz-input
+              formControlName="name"
+              id="name"
+              placeholder="Enter playlist name"
+              maxlength="100"
+            />
+          </nz-form-control>
+        </nz-form-item>
+
+        <!-- Description -->
+        <nz-form-item>
+          <nz-form-label nzFor="description">Description</nz-form-label>
+          <nz-form-control>
+            <textarea
+              nz-input
+              formControlName="description"
+              id="description"
+              placeholder="Enter playlist description (optional)"
+              rows="3"
+              maxlength="500"
+            >
+            </textarea>
+          </nz-form-control>
+        </nz-form-item>
+
+        <!-- Public/Private -->
+        <nz-form-item>
+          <nz-form-control>
+            <label nz-checkbox formControlName="isPublic">
+              Make this playlist public
+            </label>
+            <div class="form-help-text">
+              Public playlists can be discovered and viewed by other users.
+            </div>
+          </nz-form-control>
+        </nz-form-item>
+      </form>
+    </div>
+  </nz-modal>
+</nz-layout>

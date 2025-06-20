@@ -1,0 +1,234 @@
+<div class="music-search-container">
+  <nz-card class="search-card" nzTitle="Search Music">
+    <!-- Search Form -->
+    <form
+      nz-form
+      [formGroup]="searchForm"
+      (ngSubmit)="onSearch()"
+      class="search-form"
+    >
+      <div class="search-controls">
+        <!-- Search Type Selector -->
+        <nz-select
+          formControlName="searchType"
+          class="search-type-select"
+          nzPlacement="bottomLeft"
+        >
+          <nz-option nzValue="track" nzLabel="Tracks"></nz-option>
+          <nz-option nzValue="artist" nzLabel="Artists"></nz-option>
+          <nz-option nzValue="album" nzLabel="Albums"></nz-option>
+        </nz-select>
+
+        <!-- Search Input -->
+        <nz-input-group class="search-input-group" [nzSuffix]="suffixTemplate">
+          <input
+            nz-input
+            formControlName="query"
+            placeholder="Search for music, artists, or albums..."
+            (keyup.enter)="onSearch()"
+          />
+        </nz-input-group>
+
+        <ng-template #suffixTemplate>
+          <button
+            nz-button
+            nzType="text"
+            nzSize="small"
+            *ngIf="searchForm.get('query')?.value"
+            (click)="clearSearch()"
+          >
+            <span nz-icon nzType="close" nzTheme="outline"></span>
+          </button>
+        </ng-template>
+
+        <!-- Search Button -->
+        <button
+          nz-button
+          nzType="primary"
+          [disabled]="!canSearch() || isLoading()"
+          [nzLoading]="isLoading()"
+          (click)="onSearch()"
+        >
+          <span nz-icon nzType="search" nzTheme="outline"></span>
+          Search
+        </button>
+      </div>
+    </form>
+
+    <!-- Error Alert -->
+    <nz-alert
+      *ngIf="error()"
+      nzType="error"
+      nzShowIcon
+      [nzMessage]="error()"
+      nzCloseable
+      (nzOnClose)="error.set(null)"
+      class="error-alert"
+    >
+    </nz-alert>
+
+    <!-- Loading Indicator -->
+    <div *ngIf="isLoading()" class="loading-container">
+      <nz-spin nzSize="large">
+        <div class="loading-text">Searching...</div>
+      </nz-spin>
+    </div>
+
+    <!-- Search Results -->
+    <div *ngIf="!isLoading() && hasSearched()" class="results-section">
+      <!-- Results Header -->
+      <div class="results-header">
+        <h3>Search Results</h3>
+        <span class="results-count"
+          >{{ searchResults().length }} results found</span
+        >
+      </div>
+
+      <!-- No Results -->
+      <nz-empty
+        *ngIf="!hasResults()"
+        nzNotFoundImage="simple"
+        nzNotFoundContent="No results found. Try different search terms."
+      >
+      </nz-empty>
+
+      <!-- Results List -->
+      <nz-list
+        *ngIf="hasResults()"
+        [nzDataSource]="searchResults()"
+        nzBordered
+        class="results-list"
+      >
+        <nz-list-item
+          *ngFor="let result of searchResults(); trackBy: trackByFn"
+          class="result-item"
+          [nzActions]="[favoriteAction, playlistAction]"
+        >
+          <!-- Track Info -->
+          <nz-list-item-meta>
+            <!-- Album Art -->
+            <div nz-list-item-meta-avatar>
+              <img
+                [src]="result.image"
+                [alt]="result.name"
+                width="60"
+                height="60"
+                class="track-image"
+                (error)="onImageError($event)"
+              />
+            </div>
+
+            <!-- Track Details -->
+            <div nz-list-item-meta-title>
+              <div class="track-title">
+                {{ result.name }}
+                <nz-tag [nzColor]="getTypeColor(result.type)" class="type-tag">
+                  <span
+                    nz-icon
+                    [nzType]="getTypeIcon(result.type)"
+                    nzTheme="outline"
+                  ></span>
+                  {{ result.type | titlecase }}
+                </nz-tag>
+              </div>
+            </div>
+
+            <div nz-list-item-meta-description>
+              <div class="track-details">
+                <div class="artist-album">
+                  <strong>{{ result.artist }}</strong>
+                  <span
+                    *ngIf="result.album && result.album !== 'Unknown Album'"
+                  >
+                    • {{ result.album }}</span
+                  >
+                </div>
+                <div class="track-stats">
+                  <span *ngIf="result.duration > 0" class="duration">
+                    <span
+                      nz-icon
+                      nzType="clock-circle"
+                      nzTheme="outline"
+                    ></span>
+                    {{ formatDuration(result.duration) }}
+                  </span>
+                  <span *ngIf="result.playcount > 0" class="playcount">
+                    <span nz-icon nzType="play-circle" nzTheme="outline"></span>
+                    {{ formatNumber(result.playcount) }} plays
+                  </span>
+                  <span *ngIf="result.listeners > 0" class="listeners">
+                    <span nz-icon nzType="user" nzTheme="outline"></span>
+                    {{ formatNumber(result.listeners) }} listeners
+                  </span>
+                </div>
+              </div>
+            </div>
+          </nz-list-item-meta>
+
+          <!-- Actions -->
+          <ng-template #favoriteAction>
+            <button
+              nz-button
+              nzType="text"
+              [nzShape]="'circle'"
+              (click)="toggleFavorite(result)"
+              [class.favorite-active]="isFavorite(result.id)"
+              title="Toggle Favorite"
+            >
+              <span
+                nz-icon
+                [nzType]="isFavorite(result.id) ? 'heart' : 'heart'"
+                [nzTheme]="isFavorite(result.id) ? 'fill' : 'outline'"
+              >
+              </span>
+            </button>
+          </ng-template>
+
+          <ng-template #playlistAction>
+            <div
+              nz-dropdown
+              nzPlacement="bottomRight"
+              [nzDropdownMenu]="playlistMenu"
+              *ngIf="playlists().length > 0"
+            >
+              <button
+                nz-button
+                nzType="primary"
+                nzSize="small"
+                title="Add to Playlist"
+              >
+                <span nz-icon nzType="plus" nzTheme="outline"></span>
+                Add to Playlist
+              </button>
+            </div>
+
+            <nz-dropdown-menu #playlistMenu="nzDropdownMenu">
+              <ul nz-menu>
+                <li
+                  nz-menu-item
+                  *ngFor="let playlist of playlists()"
+                  (click)="addToPlaylist(playlist.id, result)"
+                >
+                  <span
+                    nz-icon
+                    nzType="unordered-list"
+                    nzTheme="outline"
+                  ></span>
+                  {{ playlist.name }}
+                  <span class="playlist-track-count"
+                    >({{ playlist.tracks.length }})</span
+                  >
+                </li>
+              </ul>
+            </nz-dropdown-menu>
+
+            <!-- Show message if no playlists -->
+            <span *ngIf="playlists().length === 0" class="no-playlists-text">
+              Create a playlist first
+            </span>
+          </ng-template>
+        </nz-list-item>
+      </nz-list>
+    </div>
+  </nz-card>
+</div>

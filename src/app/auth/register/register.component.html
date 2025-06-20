@@ -1,0 +1,184 @@
+<div class="register-container">
+  <nz-card class="register-card" nzTitle="Create Account" nzSize="default">
+    <!-- Error Alert -->
+    <nz-alert
+      *ngIf="error()"
+      nzType="error"
+      nzShowIcon
+      nzCloseable
+      class="error-alert"
+      [nzMessage]="error()"
+      (nzOnClose)="authService.clearError()"
+    >
+    </nz-alert>
+
+    <!-- Register Form -->
+    <form
+      nz-form
+      class="register-form"
+      [formGroup]="registerForm"
+      (ngSubmit)="onSubmit()"
+    >
+      <!-- Name Fields Row -->
+      <div class="name-row">
+        <!-- First Name Field -->
+        <nz-form-item class="name-field">
+          <nz-form-label nzRequired nzFor="firstName">First Name</nz-form-label>
+          <nz-form-control
+            [nzErrorTip]="getErrorMessage('firstName')"
+            [nzValidateStatus]="hasError('firstName') ? 'error' : ''"
+          >
+            <input
+              nz-input
+              formControlName="firstName"
+              id="firstName"
+              type="text"
+              placeholder="Enter first name"
+              [class.error-input]="hasError('firstName')"
+            />
+          </nz-form-control>
+        </nz-form-item>
+
+        <!-- Last Name Field -->
+        <nz-form-item class="name-field">
+          <nz-form-label nzRequired nzFor="lastName">Last Name</nz-form-label>
+          <nz-form-control
+            [nzErrorTip]="getErrorMessage('lastName')"
+            [nzValidateStatus]="hasError('lastName') ? 'error' : ''"
+          >
+            <input
+              nz-input
+              formControlName="lastName"
+              id="lastName"
+              type="text"
+              placeholder="Enter last name"
+              [class.error-input]="hasError('lastName')"
+            />
+          </nz-form-control>
+        </nz-form-item>
+      </div>
+
+      <!-- Email Field -->
+      <nz-form-item>
+        <nz-form-label nzRequired nzFor="email">Email</nz-form-label>
+        <nz-form-control
+          [nzErrorTip]="getErrorMessage('email')"
+          [nzValidateStatus]="hasError('email') ? 'error' : ''"
+        >
+          <input
+            nz-input
+            formControlName="email"
+            id="email"
+            type="email"
+            placeholder="Enter your email"
+            [class.error-input]="hasError('email')"
+          />
+        </nz-form-control>
+      </nz-form-item>
+
+      <!-- Password Field -->
+      <nz-form-item>
+        <nz-form-label nzRequired nzFor="password">Password</nz-form-label>
+        <nz-form-control
+          [nzErrorTip]="getErrorMessage('password')"
+          [nzValidateStatus]="hasError('password') ? 'error' : ''"
+        >
+          <nz-input-group [nzSuffix]="passwordSuffixTemplate">
+            <input
+              nz-input
+              formControlName="password"
+              id="password"
+              placeholder="Enter your password"
+              [type]="passwordVisible() ? 'text' : 'password'"
+              [class.error-input]="hasError('password')"
+            />
+          </nz-input-group>
+          <ng-template #passwordSuffixTemplate>
+            <span
+              nz-icon
+              class="password-toggle"
+              [nzType]="passwordVisible() ? 'eye-invisible' : 'eye'"
+              (click)="togglePasswordVisibility()"
+            >
+            </span>
+          </ng-template>
+        </nz-form-control>
+      </nz-form-item>
+
+      <!-- Confirm Password Field -->
+      <nz-form-item>
+        <nz-form-label nzRequired nzFor="confirmPassword"
+          >Confirm Password</nz-form-label
+        >
+        <nz-form-control
+          [nzErrorTip]="getErrorMessage('confirmPassword')"
+          [nzValidateStatus]="hasError('confirmPassword') ? 'error' : ''"
+        >
+          <nz-input-group [nzSuffix]="confirmPasswordSuffixTemplate">
+            <input
+              nz-input
+              formControlName="confirmPassword"
+              id="confirmPassword"
+              placeholder="Confirm your password"
+              [type]="confirmPasswordVisible() ? 'text' : 'password'"
+              [class.error-input]="hasError('confirmPassword')"
+            />
+          </nz-input-group>
+          <ng-template #confirmPasswordSuffixTemplate>
+            <span
+              nz-icon
+              class="password-toggle"
+              [nzType]="confirmPasswordVisible() ? 'eye-invisible' : 'eye'"
+              (click)="toggleConfirmPasswordVisibility()"
+            >
+            </span>
+          </ng-template>
+        </nz-form-control>
+      </nz-form-item>
+
+      <!-- Password Requirements Info -->
+      <nz-form-item class="password-info">
+        <nz-form-control>
+          <div class="password-requirements">
+            <p><strong>Password must contain:</strong></p>
+            <ul>
+              <li>At least 6 characters</li>
+              <li>One uppercase letter (A-Z)</li>
+              <li>One lowercase letter (a-z)</li>
+              <li>One number (0-9)</li>
+              <li>One special character (!&#64;#$%^&amp;*)</li>
+            </ul>
+          </div>
+        </nz-form-control>
+      </nz-form-item>
+
+      <!-- Submit Button -->
+      <nz-form-item class="submit-button">
+        <nz-form-control>
+          <button
+            nz-button
+            nzType="primary"
+            nzSize="large"
+            type="submit"
+            nzBlock
+            [nzLoading]="isLoading()"
+            [disabled]="isLoading()"
+          >
+            <span *ngIf="!isLoading()">Create Account</span>
+            <span *ngIf="isLoading()">Creating Account...</span>
+          </button>
+        </nz-form-control>
+      </nz-form-item>
+
+      <!-- Login Link -->
+      <nz-form-item class="login-link">
+        <nz-form-control>
+          <p>
+            Already have an account?
+            <a class="link" (click)="goToLogin()">Sign in</a>
+          </p>
+        </nz-form-control>
+      </nz-form-item>
+    </form>
+  </nz-card>
+</div>

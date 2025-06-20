@@ -10,6 +10,7 @@ import {
   LastFmTrack,
   LastFmArtist,
   LastFmAlbum,
+  LastFmImage,
   LastFmSearchResponse,
   LastFmTrackResponse,
   LastFmArtistResponse,
@@ -212,6 +213,110 @@ export class LastfmService {
         map(response => this.mapLastFmTracksToTracks(response.toptracks.track)),
         catchError(this.handleError)
       );
+  }
+
+  /**
+   * Convert LastFM track to playlist Track format
+   */
+  convertToPlaylistTrack(
+    lastFmTrack: LastFmTrack
+  ): import('./playlist.service').Track {
+    const artistName =
+      typeof lastFmTrack.artist === 'string'
+        ? lastFmTrack.artist
+        : lastFmTrack.artist?.name || 'Unknown Artist';
+
+    const albumName =
+      typeof lastFmTrack.album === 'string'
+        ? lastFmTrack.album
+        : lastFmTrack.album?.name || 'Unknown Album';
+
+    return {
+      id: `${artistName}-${lastFmTrack.name}`
+        .toLowerCase()
+        .replace(/\s+/g, '-')
+        .replace(/[^a-z0-9-]/g, ''),
+      name: lastFmTrack.name,
+      artist: artistName,
+      album: albumName,
+      duration: parseInt(lastFmTrack.duration || '0'),
+      image: this.getBestImageUrl(lastFmTrack.image),
+      url: lastFmTrack.url,
+      playcount: parseInt(lastFmTrack.playcount || '0'),
+      listeners: parseInt(lastFmTrack.listeners || '0'),
+      addedAt: new Date(),
+    };
+  }
+
+  /**
+   * Convert LastFM artist to playlist Track format (for artist search)
+   */
+  convertArtistToPlaylistTrack(
+    lastFmArtist: LastFmArtist
+  ): import('./playlist.service').Track {
+    return {
+      id: `artist-${lastFmArtist.name}`
+        .toLowerCase()
+        .replace(/\s+/g, '-')
+        .replace(/[^a-z0-9-]/g, ''),
+      name: `${lastFmArtist.name} (Artist)`,
+      artist: lastFmArtist.name,
+      album: 'Artist Profile',
+      duration: 0,
+      image: this.getBestImageUrl(lastFmArtist.image),
+      url: lastFmArtist.url,
+      playcount: parseInt(lastFmArtist.stats?.playcount || '0'),
+      listeners: parseInt(lastFmArtist.stats?.listeners || '0'),
+      addedAt: new Date(),
+    };
+  }
+
+  /**
+   * Convert LastFM album to playlist Track format (for album search)
+   */
+  convertAlbumToPlaylistTrack(
+    lastFmAlbum: LastFmAlbum
+  ): import('./playlist.service').Track {
+    return {
+      id: `album-${lastFmAlbum.artist}-${lastFmAlbum.name}`
+        .toLowerCase()
+        .replace(/\s+/g, '-')
+        .replace(/[^a-z0-9-]/g, ''),
+      name: `${lastFmAlbum.name} (Album)`,
+      artist: lastFmAlbum.artist,
+      album: lastFmAlbum.name,
+      duration: 0,
+      image: this.getBestImageUrl(lastFmAlbum.image),
+      url: lastFmAlbum.url,
+      playcount: parseInt(lastFmAlbum.playcount || '0'),
+      listeners: parseInt(lastFmAlbum.listeners || '0'),
+      addedAt: new Date(),
+    };
+  }
+
+  /**
+   * Get the best quality image URL from LastFM image array
+   */
+  private getBestImageUrl(images?: LastFmImage[]): string {
+    if (!images || images.length === 0) {
+      return 'https://lastfm.freetls.fastly.net/i/u/300x300/2a96cbd8b46e442fc41c2b86b821562f.png'; // Default LastFM image
+    }
+
+    // Priority order: extralarge > large > medium > small
+    const priorityOrder = ['extralarge', 'large', 'medium', 'small'];
+
+    for (const size of priorityOrder) {
+      const image = images.find(img => img.size === size);
+      if (image && image['#text']) {
+        return image['#text'];
+      }
+    }
+
+    // Fallback to first available image
+    return (
+      images[0]?.['#text'] ||
+      'https://lastfm.freetls.fastly.net/i/u/300x300/2a96cbd8b46e442fc41c2b86b821562f.png'
+    );
   }
 
   private buildParams(

@@ -1,0 +1,364 @@
+<div class="playlist-manager">
+  <!-- Header Section -->
+  <div class="manager-header">
+    <div class="header-content">
+      <div class="title-section">
+        <h2>
+          <span nz-icon nzType="ordered-list" nzTheme="outline"></span>
+          Playlist Manager
+        </h2>
+        <p class="subtitle">Manage your music playlists</p>
+      </div>
+
+      <!-- Stats Cards -->
+      <div class="stats-row">
+        <div class="stat-card">
+          <div class="stat-value">{{ stats().totalPlaylists }}</div>
+          <div class="stat-label">Playlists</div>
+        </div>
+        <div class="stat-card">
+          <div class="stat-value">{{ stats().totalTracks }}</div>
+          <div class="stat-label">Total Tracks</div>
+        </div>
+        <div class="stat-card">
+          <div class="stat-value">
+            {{ formatDuration(stats().totalDuration) }}
+          </div>
+          <div class="stat-label">Total Duration</div>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <!-- Actions Bar -->
+  <div class="actions-bar">
+    <div class="search-section">
+      <nz-input-group [nzSuffix]="searchSuffix" [nzPrefix]="searchPrefix">
+        <input
+          nz-input
+          placeholder="Search playlists..."
+          [ngModel]="searchTerm()"
+          (ngModelChange)="onSearch($event)"
+        />
+      </nz-input-group>
+      <ng-template #searchPrefix>
+        <span nz-icon nzType="search" nzTheme="outline"></span>
+      </ng-template>
+      <ng-template #searchSuffix>
+        @if (searchTerm()) {
+          <span
+            nz-icon
+            nzType="close-circle"
+            nzTheme="fill"
+            class="clear-icon"
+            (click)="clearSearch()"
+            nz-tooltip="Clear search"
+          ></span>
+        }
+      </ng-template>
+    </div>
+
+    <div class="action-buttons">
+      <button
+        nz-button
+        nzType="primary"
+        (click)="openCreateModal()"
+        nz-tooltip="Create new playlist"
+      >
+        <span nz-icon nzType="plus" nzTheme="outline"></span>
+        New Playlist
+      </button>
+    </div>
+  </div>
+
+  <!-- Playlists Table -->
+  <div class="table-container">
+    <nz-table
+      #playlistTable
+      [nzData]="tableData()"
+      [nzShowPagination]="tableData().length > 10"
+      [nzPageSize]="10"
+      nzBordered
+      nzSize="middle"
+      [nzShowSizeChanger]="true"
+      [nzPageSizeOptions]="[10, 20, 50]"
+    >
+      <thead>
+        <tr>
+          <th
+            nzColumnKey="name"
+            [nzSortFn]="true"
+            (nzSortOrderChange)="onSort('name')"
+            nzWidth="25%"
+          >
+            <span class="sortable-header" (click)="onSort('name')">
+              Name
+              <span
+                nz-icon
+                [nzType]="getSortIcon('name')"
+                nzTheme="outline"
+              ></span>
+            </span>
+          </th>
+          <th nzWidth="30%">Description</th>
+          <th
+            nzColumnKey="trackCount"
+            [nzSortFn]="true"
+            (nzSortOrderChange)="onSort('trackCount')"
+            nzAlign="center"
+            nzWidth="12%"
+          >
+            <span class="sortable-header" (click)="onSort('trackCount')">
+              Tracks
+              <span
+                nz-icon
+                [nzType]="getSortIcon('trackCount')"
+                nzTheme="outline"
+              ></span>
+            </span>
+          </th>
+          <th
+            nzColumnKey="totalDuration"
+            [nzSortFn]="true"
+            (nzSortOrderChange)="onSort('totalDuration')"
+            nzAlign="center"
+            nzWidth="12%"
+          >
+            <span class="sortable-header" (click)="onSort('totalDuration')">
+              Duration
+              <span
+                nz-icon
+                [nzType]="getSortIcon('totalDuration')"
+                nzTheme="outline"
+              ></span>
+            </span>
+          </th>
+          <th
+            nzColumnKey="updatedAt"
+            [nzSortFn]="true"
+            (nzSortOrderChange)="onSort('updatedAt')"
+            nzAlign="center"
+            nzWidth="12%"
+          >
+            <span class="sortable-header" (click)="onSort('updatedAt')">
+              Updated
+              <span
+                nz-icon
+                [nzType]="getSortIcon('updatedAt')"
+                nzTheme="outline"
+              ></span>
+            </span>
+          </th>
+          <th nzAlign="center" nzWidth="15%">Actions</th>
+        </tr>
+      </thead>
+      <tbody>
+        @for (playlist of tableData(); track playlist.id) {
+          <tr
+            class="playlist-row"
+            [class.selected]="selectedPlaylistId() === playlist.id"
+          >
+            <td>
+              <div class="playlist-name">
+                <div class="name-content">
+                  <strong>{{ playlist.name }}</strong>
+                  <div class="playlist-badges">
+                    @if (playlist.isPublic) {
+                      <nz-tag nzColor="green">
+                        <span nz-icon nzType="global" nzTheme="outline"></span>
+                        Public
+                      </nz-tag>
+                    } @else {
+                      <nz-tag nzColor="blue">
+                        <span nz-icon nzType="lock" nzTheme="outline"></span>
+                        Private
+                      </nz-tag>
+                    }
+                  </div>
+                </div>
+              </div>
+            </td>
+            <td>
+              <div class="description-cell">
+                @if (playlist.description) {
+                  <span
+                    [nz-tooltip]="playlist.description"
+                    nzTooltipPlacement="top"
+                  >
+                    {{
+                      playlist.description.length > 50
+                        ? (playlist.description | slice: 0 : 50) + '...'
+                        : playlist.description
+                    }}
+                  </span>
+                } @else {
+                  <span class="no-description">No description</span>
+                }
+              </div>
+            </td>
+            <td nzAlign="center">
+              <div class="track-count">
+                <span nz-icon nzType="sound" nzTheme="outline"></span>
+                {{ playlist.trackCount }}
+              </div>
+            </td>
+            <td nzAlign="center">
+              <div class="duration">
+                <span nz-icon nzType="clock-circle" nzTheme="outline"></span>
+                {{ playlist.formattedDuration }}
+              </div>
+            </td>
+            <td nzAlign="center">
+              <span class="last-updated">{{ playlist.lastUpdated }}</span>
+            </td>
+            <td nzAlign="center">
+              <nz-space nzSize="small">
+                <button
+                  *nzSpaceItem
+                  nz-button
+                  nzType="link"
+                  nzSize="small"
+                  (click)="onSelect(playlist)"
+                  nz-tooltip="View playlist"
+                >
+                  <span nz-icon nzType="eye" nzTheme="outline"></span>
+                </button>
+                <button
+                  *nzSpaceItem
+                  nz-button
+                  nzType="link"
+                  nzSize="small"
+                  (click)="openEditModal(playlist)"
+                  nz-tooltip="Edit playlist"
+                >
+                  <span nz-icon nzType="edit" nzTheme="outline"></span>
+                </button>
+                <button
+                  *nzSpaceItem
+                  nz-button
+                  nzType="link"
+                  nzDanger
+                  nzSize="small"
+                  nz-popconfirm
+                  nzPopconfirmTitle="Are you sure you want to delete this playlist?"
+                  nzPopconfirmPlacement="topRight"
+                  (nzOnConfirm)="onDelete(playlist)"
+                  nz-tooltip="Delete playlist"
+                >
+                  <span nz-icon nzType="delete" nzTheme="outline"></span>
+                </button>
+              </nz-space>
+            </td>
+          </tr>
+        } @empty {
+          <tr>
+            <td colspan="6" class="empty-state">
+              <div class="empty-content">
+                @if (searchTerm()) {
+                  <span
+                    nz-icon
+                    nzType="search"
+                    nzTheme="outline"
+                    class="empty-icon"
+                  ></span>
+                  <h3>No playlists found</h3>
+                  <p>No playlists match your search criteria.</p>
+                  <button nz-button nzType="link" (click)="clearSearch()">
+                    Clear search
+                  </button>
+                } @else {
+                  <span
+                    nz-icon
+                    nzType="plus-circle"
+                    nzTheme="outline"
+                    class="empty-icon"
+                  ></span>
+                  <h3>No playlists yet</h3>
+                  <p>Create your first playlist to get started.</p>
+                  <button
+                    nz-button
+                    nzType="primary"
+                    (click)="openCreateModal()"
+                  >
+                    Create Playlist
+                  </button>
+                }
+              </div>
+            </td>
+          </tr>
+        }
+      </tbody>
+    </nz-table>
+  </div>
+
+  <!-- Create/Edit Playlist Modal -->
+  <nz-modal
+    [(nzVisible)]="isModalVisible"
+    [nzTitle]="isEditing() ? 'Edit Playlist' : 'Create New Playlist'"
+    [nzOkText]="isEditing() ? 'Update' : 'Create'"
+    nzCancelText="Cancel"
+    (nzOnCancel)="closeModal()"
+    (nzOnOk)="onSubmit()"
+    [nzOkLoading]="false"
+    [nzOkDisabled]="playlistForm.invalid"
+    nzWidth="500px"
+  >
+    <div *nzModalContent>
+      <form nz-form [formGroup]="playlistForm" nzLayout="vertical">
+        <!-- Playlist Name -->
+        <nz-form-item>
+          <nz-form-label nzRequired>Playlist Name</nz-form-label>
+          <nz-form-control [nzErrorTip]="getFieldError('name')">
+            <input
+              nz-input
+              formControlName="name"
+              placeholder="Enter playlist name"
+              [class.error]="isFieldInvalid('name')"
+            />
+          </nz-form-control>
+        </nz-form-item>
+
+        <!-- Description -->
+        <nz-form-item>
+          <nz-form-label>Description</nz-form-label>
+          <nz-form-control>
+            <textarea
+              nz-input
+              formControlName="description"
+              placeholder="Enter playlist description (optional)"
+              rows="3"
+            ></textarea>
+          </nz-form-control>
+        </nz-form-item>
+
+        <!-- Public/Private Toggle -->
+        <nz-form-item>
+          <nz-form-label>Visibility</nz-form-label>
+          <nz-form-control>
+            <div class="visibility-control">
+              <nz-switch
+                formControlName="isPublic"
+                [nzCheckedChildren]="publicTemplate"
+                [nzUnCheckedChildren]="privateTemplate"
+              ></nz-switch>
+              <span class="visibility-text">
+                @if (playlistForm.get('isPublic')?.value) {
+                  Public - visible to everyone
+                } @else {
+                  Private - only visible to you
+                }
+              </span>
+            </div>
+          </nz-form-control>
+        </nz-form-item>
+
+        <ng-template #publicTemplate>
+          <span nz-icon nzType="global" nzTheme="outline"></span>
+        </ng-template>
+        <ng-template #privateTemplate>
+          <span nz-icon nzType="lock" nzTheme="outline"></span>
+        </ng-template>
+      </form>
+    </div>
+  </nz-modal>
+</div>
