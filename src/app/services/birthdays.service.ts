@@ -22,7 +22,6 @@ export class BirthdayApiService {
   private readonly baseUrl = 'http://localhost:3000/api';
   private readonly tokenKey = 'birthday_app_token';
 
-  // User state management
   private currentUserSubject = new BehaviorSubject<User | null>(null);
   public currentUser$ = this.currentUserSubject.asObservable();
 
@@ -30,11 +29,9 @@ export class BirthdayApiService {
   public isAuthenticated$ = this.isAuthenticatedSubject.asObservable();
 
   constructor(private http: HttpClient) {
-    // Check for existing token on service initialization
     this.initializeAuth();
   }
 
-  // Authentication Methods
   register(userData: RegisterRequest): Observable<AuthResponse> {
     return this.http
       .post<AuthResponse>(`${this.baseUrl}/auth/register`, userData)
@@ -70,7 +67,6 @@ export class BirthdayApiService {
       );
   }
 
-  // Friends Methods
   getFriends(): Observable<Friend[]> {
     return this.http
       .get<Friend[]>(`${this.baseUrl}/friends`, {
@@ -114,7 +110,6 @@ export class BirthdayApiService {
       .pipe(catchError(this.handleError));
   }
 
-  // Birthday Methods
   getBirthdays(): Observable<BirthdayReminder[]> {
     return this.http
       .get<BirthdayReminder[]>(`${this.baseUrl}/birthdays`, {
@@ -139,15 +134,13 @@ export class BirthdayApiService {
       .pipe(catchError(this.handleError));
   }
 
-  // Utility Methods
   private initializeAuth(): void {
     const token = this.getToken();
     if (token) {
       this.isAuthenticatedSubject.next(true);
-      // Optionally fetch current user data
       this.getCurrentUser().subscribe({
-        next: () => {}, // User data is handled by tap operator
-        error: () => this.logout(), // Invalid token, logout
+        next: () => {},
+        error: () => this.logout(),
       });
     }
   }
@@ -177,12 +170,10 @@ export class BirthdayApiService {
   private handleError = (error: any) => {
     console.error('API Error:', error);
 
-    // Handle specific HTTP status codes
     if (error.status === 401) {
-      this.logout(); // Auto logout on unauthorized
+      this.logout();
     }
 
-    // Return user-friendly error message
     const apiError: ApiError = {
       error: error.error?.error || 'An unexpected error occurred',
       details: error.error?.details || [],
@@ -191,12 +182,10 @@ export class BirthdayApiService {
     return throwError(() => apiError);
   };
 
-  // Helper method to check if user is authenticated
   isAuthenticated(): boolean {
     return this.isAuthenticatedSubject.value;
   }
 
-  // Helper method to get current user synchronously
   getCurrentUserValue(): User | null {
     return this.currentUserSubject.value;
   }

@@ -69,7 +69,6 @@ export class DashboardComponent implements OnInit {
   private apiService = inject(BirthdayApiService);
   private router = inject(Router);
 
-  // Signals
   friends = signal<Friend[]>([]);
   filteredFriends = signal<Friend[]>([]);
   birthdays = signal<BirthdayReminder[]>([]);
@@ -78,16 +77,13 @@ export class DashboardComponent implements OnInit {
   loading = signal(false);
   searchQuery = signal('');
 
-  // Modal states
   isAddModalVisible = signal(false);
   isEditModalVisible = signal(false);
   editingFriend = signal<Friend | null>(null);
   modalLoading = signal(false);
 
-  // User info
   currentUser$ = this.apiService.currentUser$;
 
-  // Computed values
   totalFriends = computed(() => this.friends().length);
   upcomingBirthdays = computed(() => {
     const friends = this.friends();
@@ -97,7 +93,6 @@ export class DashboardComponent implements OnInit {
     }).length;
   });
 
-  // Compute today's birthdays from friends list
   todaysBirthdaysComputed = computed(() => {
     const friends = this.friends();
     return friends
@@ -115,7 +110,6 @@ export class DashboardComponent implements OnInit {
       }));
   });
 
-  // Compute next birthday from friends list since API might not return it
   nextBirthdayComputed = computed(() => {
     const friends = this.friends();
     if (friends.length === 0) return null;
@@ -126,7 +120,6 @@ export class DashboardComponent implements OnInit {
       age: this.calculateAge(friend.birthday),
     }));
 
-    // Sort by days until birthday and get the closest one
     const sortedByDays = friendsWithDays
       .filter(f => f.daysUntil >= 0)
       .sort((a, b) => a.daysUntil - b.daysUntil);
@@ -134,12 +127,10 @@ export class DashboardComponent implements OnInit {
     return sortedByDays.length > 0 ? sortedByDays[0] : null;
   });
 
-  // Table sorting
   sortField = signal<string | null>(null);
   sortOrder = signal<'asc' | 'desc' | null>(null);
 
   constructor() {
-    // Setup search effect in injection context with allowSignalWrites
     effect(
       () => {
         const query = this.searchQuery();
@@ -221,7 +212,6 @@ export class DashboardComponent implements OnInit {
     });
   }
 
-  // Table operations
   onSort(field: string) {
     if (this.sortField() === field) {
       this.sortOrder.set(this.sortOrder() === 'asc' ? 'desc' : 'asc');
@@ -244,7 +234,6 @@ export class DashboardComponent implements OnInit {
     this.filteredFriends.set(sorted);
   }
 
-  // Modal operations
   showAddModal() {
     this.isAddModalVisible.set(true);
   }
@@ -263,14 +252,13 @@ export class DashboardComponent implements OnInit {
     this.editingFriend.set(null);
   }
 
-  // CRUD operations
   onSaveFriend(friendData: CreateFriendRequest | UpdateFriendRequest) {
     this.modalLoading.set(true);
     this.apiService.createFriend(friendData as CreateFriendRequest).subscribe({
       next: () => {
         this.modalLoading.set(false);
         this.hideAddModal();
-        this.loadData(); // Refresh all data
+        this.loadData();
       },
       error: error => {
         console.error('Error creating friend:', error);
@@ -289,7 +277,7 @@ export class DashboardComponent implements OnInit {
         next: () => {
           this.modalLoading.set(false);
           this.hideEditModal();
-          this.loadData(); // Refresh all data
+          this.loadData();
         },
         error: error => {
           console.error('Error updating friend:', error);
@@ -301,7 +289,7 @@ export class DashboardComponent implements OnInit {
   onDeleteFriend(friend: Friend) {
     this.apiService.deleteFriend(friend.id).subscribe({
       next: () => {
-        this.loadData(); // Refresh all data
+        this.loadData();
       },
       error: error => {
         console.error('Error deleting friend:', error);
@@ -309,7 +297,6 @@ export class DashboardComponent implements OnInit {
     });
   }
 
-  // Utility methods
   formatDate(dateString: string): string {
     return format(new Date(dateString), 'MMM dd, yyyy');
   }
@@ -323,14 +310,12 @@ export class DashboardComponent implements OnInit {
       const today = new Date();
       const birthDate = new Date(birthday);
 
-      // Create this year's birthday
       let nextBirthday = new Date(
         today.getFullYear(),
         birthDate.getMonth(),
         birthDate.getDate()
       );
 
-      // If birthday has passed this year, set to next year
       if (isBefore(nextBirthday, today) && !isToday(nextBirthday)) {
         nextBirthday = addYears(nextBirthday, 1);
       }

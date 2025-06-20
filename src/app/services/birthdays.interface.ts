@@ -1,4 +1,3 @@
-// User interfaces
 export interface User {
   id: string;
   email: string;
@@ -27,7 +26,6 @@ export interface UserResponse {
   user: User;
 }
 
-// Friend interfaces
 export interface Friend {
   id: string;
   name: string;
@@ -56,7 +54,6 @@ export interface UpdateFriendRequest {
   birthday?: string;
 }
 
-// Birthday interfaces
 export interface BirthdayReminder {
   id: string;
   friendId: string;
@@ -71,7 +68,6 @@ export interface ApiError {
   details?: any[];
 }
 
-// API Response wrapper
 export interface ApiResponse<T> {
   data?: T;
   error?: ApiError;

@@ -4,15 +4,15 @@
       <nz-tab nzTitle="Login">
         <form
           nz-form
+          class="auth-form"
           [formGroup]="loginForm"
           (ngSubmit)="onLogin()"
-          class="auth-form"
         >
           <nz-form-item>
-            <nz-form-label [nzSpan]="24" nzRequired>Email</nz-form-label>
+            <nz-form-label nzRequired [nzSpan]="24">Email</nz-form-label>
             <nz-form-control
-              [nzSpan]="24"
               nzErrorTip="Please enter a valid email address"
+              [nzSpan]="24"
             >
               <input
                 nz-input
@@ -28,17 +28,17 @@
           </nz-form-item>
 
           <nz-form-item>
-            <nz-form-label [nzSpan]="24" nzRequired>Password</nz-form-label>
+            <nz-form-label nzRequired [nzSpan]="24">Password</nz-form-label>
             <nz-form-control
-              [nzSpan]="24"
               nzErrorTip="Please enter your password"
+              [nzSpan]="24"
             >
               <nz-input-group [nzSuffix]="suffixTemplate">
                 <input
-                  [type]="passwordVisible() ? 'text' : 'password'"
                   nz-input
                   formControlName="password"
                   placeholder="Enter your password"
+                  [type]="passwordVisible() ? 'text' : 'password'"
                   [class.error]="
                     loginForm.get('password')?.invalid &&
                     loginForm.get('password')?.touched
@@ -48,9 +48,9 @@
               <ng-template #suffixTemplate>
                 <span
                   nz-icon
+                  class="password-toggle"
                   [nzType]="passwordVisible() ? 'eye-invisible' : 'eye'"
                   (click)="togglePasswordVisibility()"
-                  class="password-toggle"
                 ></span>
               </ng-template>
             </nz-form-control>
@@ -67,11 +67,11 @@
           @if (error()) {
             <nz-alert
               nzType="error"
-              [nzMessage]="error()"
               nzShowIcon
               nzCloseable
-              (nzOnClose)="clearError()"
               class="error-alert"
+              [nzMessage]="error()"
+              (nzOnClose)="clearError()"
             ></nz-alert>
           }
 
@@ -81,9 +81,9 @@
                 nz-button
                 nzType="primary"
                 nzBlock
+                type="submit"
                 [nzLoading]="loading()"
                 [disabled]="loginForm.invalid"
-                type="submit"
               >
                 Sign In
               </button>
@@ -95,15 +95,15 @@
       <nz-tab nzTitle="Register">
         <form
           nz-form
+          class="auth-form"
           [formGroup]="registerForm"
           (ngSubmit)="onRegister()"
-          class="auth-form"
         >
           <nz-form-item>
-            <nz-form-label [nzSpan]="24" nzRequired>Email</nz-form-label>
+            <nz-form-label nzRequired [nzSpan]="24">Email</nz-form-label>
             <nz-form-control
-              [nzSpan]="24"
               nzErrorTip="Please enter a valid email address"
+              [nzSpan]="24"
             >
               <input
                 nz-input
@@ -121,12 +121,12 @@
           <div nz-row nzGutter="8">
             <div nz-col nzSpan="12">
               <nz-form-item>
-                <nz-form-label [nzSpan]="24" nzRequired
+                <nz-form-label nzRequired [nzSpan]="24"
                   >First Name</nz-form-label
                 >
                 <nz-form-control
-                  [nzSpan]="24"
                   nzErrorTip="Please enter your first name"
+                  [nzSpan]="24"
                 >
                   <input
                     nz-input
@@ -142,12 +142,12 @@
             </div>
             <div nz-col nzSpan="12">
               <nz-form-item>
-                <nz-form-label [nzSpan]="24" nzRequired
+                <nz-form-label nzRequired [nzSpan]="24"
                   >Last Name</nz-form-label
                 >
                 <nz-form-control
-                  [nzSpan]="24"
                   nzErrorTip="Please enter your last name"
+                  [nzSpan]="24"
                 >
                   <input
                     nz-input
@@ -164,14 +164,14 @@
           </div>
 
           <nz-form-item>
-            <nz-form-label [nzSpan]="24" nzRequired>Password</nz-form-label>
+            <nz-form-label nzRequired [nzSpan]="24">Password</nz-form-label>
             <nz-form-control [nzSpan]="24">
               <nz-input-group [nzSuffix]="suffixTemplate2">
                 <input
-                  [type]="passwordVisible() ? 'text' : 'password'"
                   nz-input
                   formControlName="password"
                   placeholder="Enter your password"
+                  [type]="passwordVisible() ? 'text' : 'password'"
                   [class.error]="
                     registerForm.get('password')?.invalid &&
                     registerForm.get('password')?.touched
@@ -181,9 +181,9 @@
               <ng-template #suffixTemplate2>
                 <span
                   nz-icon
+                  class="password-toggle"
                   [nzType]="passwordVisible() ? 'eye-invisible' : 'eye'"
                   (click)="togglePasswordVisibility()"
-                  class="password-toggle"
                 ></span>
               </ng-template>
 
@@ -273,7 +273,7 @@
           </nz-form-item>
 
           <nz-form-item>
-            <nz-form-label [nzSpan]="24" nzRequired
+            <nz-form-label nzRequired [nzSpan]="24"
               >Confirm Password</nz-form-label
             >
             <nz-form-control [nzSpan]="24">
@@ -300,11 +300,11 @@
           @if (error()) {
             <nz-alert
               nzType="error"
-              [nzMessage]="error()"
               nzShowIcon
               nzCloseable
-              (nzOnClose)="clearError()"
               class="error-alert"
+              [nzMessage]="error()"
+              (nzOnClose)="clearError()"
             ></nz-alert>
           }
 
@@ -314,9 +314,9 @@
                 nz-button
                 nzType="primary"
                 nzBlock
+                type="submit"
                 [nzLoading]="loading()"
                 [disabled]="registerForm.invalid"
-                type="submit"
               >
                 Create Account
               </button>

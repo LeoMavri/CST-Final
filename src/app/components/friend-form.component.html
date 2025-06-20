@@ -1,16 +1,16 @@
 <form
   nz-form
+  class="friend-form"
   [formGroup]="friendForm"
   (ngSubmit)="onSubmit()"
-  class="friend-form"
 >
   <div nz-row nzGutter="16">
     <div nz-col nzSpan="12">
       <nz-form-item>
-        <nz-form-label [nzSpan]="24" nzRequired>First Name</nz-form-label>
+        <nz-form-label nzRequired [nzSpan]="24">First Name</nz-form-label>
         <nz-form-control
-          [nzSpan]="24"
           nzErrorTip="Please enter a valid first name (min 2 characters)"
+          [nzSpan]="24"
         >
           <input
             nz-input
@@ -26,10 +26,10 @@
 
     <div nz-col nzSpan="12">
       <nz-form-item>
-        <nz-form-label [nzSpan]="24" nzRequired>Last Name</nz-form-label>
+        <nz-form-label nzRequired [nzSpan]="24">Last Name</nz-form-label>
         <nz-form-control
-          [nzSpan]="24"
           nzErrorTip="Please enter a valid last name (min 2 characters)"
+          [nzSpan]="24"
         >
           <input
             nz-input
@@ -46,7 +46,7 @@
   </div>
 
   <nz-form-item>
-    <nz-form-label [nzSpan]="24" nzRequired>Phone Number</nz-form-label>
+    <nz-form-label nzRequired [nzSpan]="24">Phone Number</nz-form-label>
     <nz-form-control [nzSpan]="24">
       <input
         nz-input
@@ -66,10 +66,10 @@
   </nz-form-item>
 
   <nz-form-item>
-    <nz-form-label [nzSpan]="24" nzRequired>City</nz-form-label>
+    <nz-form-label nzRequired [nzSpan]="24">City</nz-form-label>
     <nz-form-control
-      [nzSpan]="24"
       nzErrorTip="Please enter a valid city name (min 2 characters)"
+      [nzSpan]="24"
     >
       <input
         nz-input
@@ -83,13 +83,13 @@
   </nz-form-item>
 
   <nz-form-item>
-    <nz-form-label [nzSpan]="24" nzRequired>Birthday</nz-form-label>
+    <nz-form-label nzRequired [nzSpan]="24">Birthday</nz-form-label>
     <nz-form-control [nzSpan]="24">
       <nz-date-picker
         formControlName="birthday"
         nzPlaceHolder="Select birthday"
-        [nzDisabledDate]="disabledDate"
         style="width: 100%"
+        [nzDisabledDate]="disabledDate"
         [class.error]="
           friendForm.get('birthday')?.invalid &&
           friendForm.get('birthday')?.touched
@@ -115,14 +115,14 @@
       <button
         nz-button
         nzType="primary"
-        [nzLoading]="loading"
-        [disabled]="friendForm.invalid"
         type="submit"
         class="save-btn"
+        [nzLoading]="loading"
+        [disabled]="friendForm.invalid"
       >
         {{ isEditMode() ? 'Update Friend' : 'Add Friend' }}
       </button>
-      <button nz-button type="button" (click)="onCancel()" class="cancel-btn">
+      <button nz-button type="button" class="cancel-btn" (click)="onCancel()">
         Cancel
       </button>
     </nz-form-control>

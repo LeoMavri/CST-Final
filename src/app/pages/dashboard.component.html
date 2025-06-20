@@ -11,7 +11,7 @@
             >Welcome, {{ user.name || user.email }}!</span
           >
         }
-        <button nz-button nzType="link" (click)="logout()" class="logout-btn">
+        <button nz-button nzType="link" class="logout-btn" (click)="logout()">
           <span nz-icon nzType="logout"></span>
           Logout
         </button>
@@ -26,9 +26,9 @@
         <nz-card>
           <nz-statistic
             nzTitle="Total Friends"
+            nzPrefix="👥"
             [nzValue]="totalFriends()"
             [nzValueStyle]="{ color: '#1890ff' }"
-            nzPrefix="👥"
           ></nz-statistic>
         </nz-card>
       </div>
@@ -37,9 +37,9 @@
         <nz-card>
           <nz-statistic
             nzTitle="Upcoming Birthdays"
+            nzPrefix="🎂"
             [nzValue]="upcomingBirthdays()"
             [nzValueStyle]="{ color: '#52c41a' }"
-            nzPrefix="🎂"
           ></nz-statistic>
         </nz-card>
       </div>
@@ -49,10 +49,10 @@
           @if (nextBirthdayComputed(); as next) {
             <nz-statistic
               nzTitle="Next Birthday"
-              [nzValue]="next.daysUntil"
               nzSuffix="days"
-              [nzValueStyle]="{ color: '#722ed1' }"
               nzPrefix="📅"
+              [nzValue]="next.daysUntil"
+              [nzValueStyle]="{ color: '#722ed1' }"
             ></nz-statistic>
             <div class="next-birthday-info">
               {{ next.friend.name }} {{ next.friend.surname }}
@@ -61,8 +61,8 @@
             <nz-statistic
               nzTitle="Next Birthday"
               nzValue="No data"
-              [nzValueStyle]="{ color: '#999' }"
               nzPrefix="📅"
+              [nzValueStyle]="{ color: '#999' }"
             ></nz-statistic>
           }
         </nz-card>
@@ -72,9 +72,9 @@
         <nz-card>
           <nz-statistic
             nzTitle="Today's Birthdays"
+            nzPrefix="🎉"
             [nzValue]="todaysBirthdaysComputed().length"
             [nzValueStyle]="{ color: '#eb2f96' }"
-            nzPrefix="🎉"
           ></nz-statistic>
         </nz-card>
       </div>
@@ -104,8 +104,8 @@
         <div class="table-actions">
           <nz-input-group
             nzSearch
-            [nzAddOnAfter]="suffixIconButton"
             class="search-input"
+            [nzAddOnAfter]="suffixIconButton"
           >
             <input
               type="text"
@@ -130,17 +130,17 @@
 
       <nz-table
         #basicTable
+        nzShowSizeChanger
         [nzData]="filteredFriends()"
         [nzLoading]="loading()"
-        nzShowSizeChanger
         [nzPageSize]="10"
       >
         <thead>
           <tr>
             <th
-              (click)="onSort('name')"
               class="sortable-header"
               [class.sorted]="sortField() === 'name'"
+              (click)="onSort('name')"
             >
               First Name
               <span
@@ -155,9 +155,9 @@
               ></span>
             </th>
             <th
-              (click)="onSort('surname')"
               class="sortable-header"
               [class.sorted]="sortField() === 'surname'"
+              (click)="onSort('surname')"
             >
               Last Name
               <span
@@ -172,9 +172,9 @@
               ></span>
             </th>
             <th
-              (click)="onSort('phone')"
               class="sortable-header"
               [class.sorted]="sortField() === 'phone'"
+              (click)="onSort('phone')"
             >
               Phone
               <span
@@ -189,9 +189,9 @@
               ></span>
             </th>
             <th
-              (click)="onSort('city')"
               class="sortable-header"
               [class.sorted]="sortField() === 'city'"
+              (click)="onSort('city')"
             >
               City
               <span
@@ -206,9 +206,9 @@
               ></span>
             </th>
             <th
-              (click)="onSort('birthday')"
               class="sortable-header"
               [class.sorted]="sortField() === 'birthday'"
+              (click)="onSort('birthday')"
             >
               Birthday
               <span
@@ -250,8 +250,8 @@
                   nz-button
                   nzType="link"
                   nzSize="small"
-                  (click)="showEditModal(friend)"
                   title="Edit"
+                  (click)="showEditModal(friend)"
                 >
                   <span nz-icon nzType="edit"></span>
                 </button>
@@ -262,8 +262,8 @@
                   nzSize="small"
                   nz-popconfirm
                   nzPopconfirmTitle="Are you sure you want to delete this friend?"
-                  (nzOnConfirm)="onDeleteFriend(friend)"
                   title="Delete"
+                  (nzOnConfirm)="onDeleteFriend(friend)"
                 >
                   <span nz-icon nzType="delete"></span>
                 </button>
@@ -288,11 +288,11 @@
 
 <!-- Add Friend Modal -->
 <nz-modal
-  [nzVisible]="isAddModalVisible()"
   nzTitle="Add New Friend"
-  (nzOnCancel)="hideAddModal()"
-  [nzFooter]="null"
   nzWidth="600px"
+  [nzVisible]="isAddModalVisible()"
+  [nzFooter]="null"
+  (nzOnCancel)="hideAddModal()"
 >
   <ng-container *nzModalContent>
     <app-friend-form
@@ -305,11 +305,11 @@
 
 <!-- Edit Friend Modal -->
 <nz-modal
-  [nzVisible]="isEditModalVisible()"
   nzTitle="Edit Friend"
-  (nzOnCancel)="hideEditModal()"
-  [nzFooter]="null"
   nzWidth="600px"
+  [nzVisible]="isEditModalVisible()"
+  [nzFooter]="null"
+  (nzOnCancel)="hideEditModal()"
 >
   <ng-container *nzModalContent>
     <app-friend-form

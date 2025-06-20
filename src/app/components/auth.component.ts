@@ -46,7 +46,6 @@ export class AuthComponent implements OnInit {
   private apiService = inject(BirthdayApiService);
   private router = inject(Router);
 
-  // Signals
   loading = signal(false);
   error = signal<string | null>(null);
   passwordVisible = signal(false);
@@ -57,7 +56,6 @@ export class AuthComponent implements OnInit {
   ngOnInit() {
     this.initializeForms();
 
-    // Check if user is already authenticated
     this.apiService.isAuthenticated$.subscribe(isAuth => {
       if (isAuth) {
         this.router.navigate(['/dashboard']);
@@ -96,7 +94,6 @@ export class AuthComponent implements OnInit {
           console.log('Login successful:', response);
           this.loading.set(false);
 
-          // Handle remember me functionality
           if (rememberMe) {
             localStorage.setItem('rememberUser', 'true');
           }
