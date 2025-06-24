@@ -36,22 +36,23 @@ export class BirthdayApiService {
     return this.http
       .post<AuthResponse>(`${this.baseUrl}/auth/register`, userData)
       .pipe(
-        tap(response => this.handleAuthSuccess(response)),
+        tap(response => this.handleAuthSuccess(response, false)),
         catchError(this.handleError)
       );
   }
 
-  login(credentials: LoginRequest): Observable<AuthResponse> {
+  login(credentials: LoginRequest, rememberMe: boolean = false): Observable<AuthResponse> {
     return this.http
       .post<AuthResponse>(`${this.baseUrl}/auth/login`, credentials)
       .pipe(
-        tap(response => this.handleAuthSuccess(response)),
+        tap(response => this.handleAuthSuccess(response, rememberMe)),
         catchError(this.handleError)
       );
   }
 
   logout(): void {
     localStorage.removeItem(this.tokenKey);
+    sessionStorage.removeItem(this.tokenKey);
     this.currentUserSubject.next(null);
     this.isAuthenticatedSubject.next(false);
   }
@@ -145,14 +146,21 @@ export class BirthdayApiService {
     }
   }
 
-  private handleAuthSuccess(response: AuthResponse): void {
-    localStorage.setItem(this.tokenKey, response.token);
+  private handleAuthSuccess(response: AuthResponse, rememberMe: boolean = false): void {
+    if (rememberMe) {
+      localStorage.setItem(this.tokenKey, response.token);
+      sessionStorage.removeItem(this.tokenKey);
+    } else {
+      sessionStorage.setItem(this.tokenKey, response.token);
+      localStorage.removeItem(this.tokenKey);
+    }
+    
     this.currentUserSubject.next(response.user);
     this.isAuthenticatedSubject.next(true);
   }
 
   private getToken(): string | null {
-    return localStorage.getItem(this.tokenKey);
+    return localStorage.getItem(this.tokenKey) || sessionStorage.getItem(this.tokenKey);
   }
 
   private getAuthHeaders(): HttpHeaders {

@@ -89,15 +89,10 @@ export class AuthComponent implements OnInit {
 
       const { email, password, rememberMe } = this.loginForm.value;
 
-      this.apiService.login({ email, password }).subscribe({
+      this.apiService.login({ email, password }, rememberMe).subscribe({
         next: response => {
           console.log('Login successful:', response);
           this.loading.set(false);
-
-          if (rememberMe) {
-            localStorage.setItem('rememberUser', 'true');
-          }
-
           this.router.navigate(['/dashboard']);
         },
         error: error => {
