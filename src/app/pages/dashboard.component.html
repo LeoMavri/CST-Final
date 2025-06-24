@@ -53,10 +53,8 @@
               nzPrefix="📅"
               [nzValue]="next.daysUntil"
               [nzValueStyle]="{ color: '#722ed1' }"
+              [title]="next.friend.name + ' ' + next.friend.surname"
             ></nz-statistic>
-            <div class="next-birthday-info">
-              {{ next.friend.name }} {{ next.friend.surname }}
-            </div>
           } @else {
             <nz-statistic
               nzTitle="Next Birthday"
@@ -82,19 +80,23 @@
 
     <!-- Today's Birthdays Alert -->
     @if (todaysBirthdaysComputed().length > 0) {
-      <nz-alert nzType="success" nzShowIcon class="birthday-alert">
-        <span *nzAlertContent>
-          🎉 Today's Birthdays:
-          @for (birthday of todaysBirthdaysComputed(); track birthday.id) {
-            <nz-tag nzColor="pink" class="birthday-tag">
-              {{ birthday.friend.name }} {{ birthday.friend.surname }} ({{
-                birthday.age
-              }}
-              years old)
-            </nz-tag>
-          }
-        </span>
-      </nz-alert>
+      <nz-alert
+        nzType="success"
+        class="birthday-alert"
+        [nzMessage]="birthdayMessage"
+      ></nz-alert>
+
+      <ng-template #birthdayMessage>
+        🎉 Today's Birthdays:
+        @for (birthday of todaysBirthdaysComputed(); track birthday.id) {
+          <nz-tag nzColor="pink" class="birthday-tag">
+            {{ birthday.friend.name }} {{ birthday.friend.surname }} ({{
+              birthday.age
+            }}
+            years old)
+          </nz-tag>
+        }
+      </ng-template>
     }
 
     <!-- Friends Table -->
