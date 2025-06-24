@@ -11,7 +11,7 @@ export function passwordStrengthValidator(
   const hasUpperCase = /[A-Z]/.test(value);
   const hasLowerCase = /[a-z]/.test(value);
   const hasNumeric = /[0-9]/.test(value);
-  const hasSpecialChar = /[!@#$%^&*()_+\-=\[\]{};':"\\|,.<>\/?]/.test(value);
+  const hasSpecialChar = /[!@#$%^&*()_+\-=[\]{};':"\\|,.<>/?]/.test(value);
   const isValidLength = value.length >= 6;
 
   const passwordValid =
@@ -59,8 +59,8 @@ export function phoneValidator(
     return null;
   }
 
-  const phonePattern = /^[\+]?[1-9][\d]{0,15}$/;
-  const isValid = phonePattern.test(value.replace(/[\s\-\(\)]/g, ''));
+  const phonePattern = /^[+]?[1-9][\d]{0,15}$/;
+  const isValid = phonePattern.test(value.replace(/[\s\-()]/g, ''));
 
   return isValid ? null : { invalidPhone: true };
 }

@@ -5,6 +5,7 @@ import {
   signal,
   computed,
   effect,
+  ChangeDetectionStrategy,
 } from '@angular/core';
 import { CommonModule } from '@angular/common';
 import { FormsModule } from '@angular/forms';
@@ -43,6 +44,7 @@ import { FriendFormComponent } from '../components/friend-form.component';
 @Component({
   selector: 'app-dashboard',
   standalone: true,
+  changeDetection: ChangeDetectionStrategy.OnPush,
   imports: [
     CommonModule,
     FormsModule,
@@ -221,7 +223,9 @@ export class DashboardComponent implements OnInit {
     }
 
     const sorted = [...this.filteredFriends()].sort((a, b) => {
+      // eslint-disable-next-line @typescript-eslint/no-explicit-any
       const aValue = (a as any)[field];
+      // eslint-disable-next-line @typescript-eslint/no-explicit-any
       const bValue = (b as any)[field];
 
       if (this.sortOrder() === 'asc') {

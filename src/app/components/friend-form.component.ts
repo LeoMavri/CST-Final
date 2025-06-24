@@ -6,6 +6,7 @@ import {
   OnInit,
   signal,
   inject,
+  ChangeDetectionStrategy,
 } from '@angular/core';
 import { CommonModule } from '@angular/common';
 import {
@@ -32,6 +33,7 @@ import {
 @Component({
   selector: 'app-friend-form',
   standalone: true,
+  changeDetection: ChangeDetectionStrategy.OnPush,
   imports: [
     CommonModule,
     ReactiveFormsModule,
@@ -53,7 +55,7 @@ export class FriendFormComponent implements OnInit {
   @Output() save = new EventEmitter<
     CreateFriendRequest | UpdateFriendRequest
   >();
-  @Output() cancel = new EventEmitter<void>();
+  @Output() formCancel = new EventEmitter<void>();
 
   friendForm!: FormGroup;
   isEditMode = signal(false);
@@ -98,7 +100,7 @@ export class FriendFormComponent implements OnInit {
   }
 
   onCancel() {
-    this.cancel.emit();
+    this.formCancel.emit();
   }
 
   disabledDate = (current: Date): boolean => {

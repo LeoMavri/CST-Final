@@ -65,6 +65,7 @@ export interface BirthdayReminder {
 
 export interface ApiError {
   error: string;
+  // eslint-disable-next-line @typescript-eslint/no-explicit-any
   details?: any[];
 }
 

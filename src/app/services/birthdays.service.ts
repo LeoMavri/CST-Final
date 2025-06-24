@@ -1,5 +1,9 @@
-import { Injectable } from '@angular/core';
-import { HttpClient, HttpHeaders } from '@angular/common/http';
+import { Injectable, inject } from '@angular/core';
+import {
+  HttpClient,
+  HttpHeaders,
+  HttpErrorResponse,
+} from '@angular/common/http';
 import { Observable, BehaviorSubject, throwError } from 'rxjs';
 import { catchError, tap } from 'rxjs/operators';
 import {
@@ -21,6 +25,7 @@ import {
 export class BirthdayApiService {
   private readonly baseUrl = 'http://localhost:3000/api';
   private readonly tokenKey = 'birthday_app_token';
+  private http = inject(HttpClient);
 
   private currentUserSubject = new BehaviorSubject<User | null>(null);
   public currentUser$ = this.currentUserSubject.asObservable();
@@ -28,7 +33,7 @@ export class BirthdayApiService {
   private isAuthenticatedSubject = new BehaviorSubject<boolean>(false);
   public isAuthenticated$ = this.isAuthenticatedSubject.asObservable();
 
-  constructor(private http: HttpClient) {
+  constructor() {
     this.initializeAuth();
   }
 
@@ -41,7 +46,10 @@ export class BirthdayApiService {
       );
   }
 
-  login(credentials: LoginRequest, rememberMe: boolean = false): Observable<AuthResponse> {
+  login(
+    credentials: LoginRequest,
+    rememberMe: boolean = false
+  ): Observable<AuthResponse> {
     return this.http
       .post<AuthResponse>(`${this.baseUrl}/auth/login`, credentials)
       .pipe(
@@ -146,7 +154,10 @@ export class BirthdayApiService {
     }
   }
 
-  private handleAuthSuccess(response: AuthResponse, rememberMe: boolean = false): void {
+  private handleAuthSuccess(
+    response: AuthResponse,
+    rememberMe: boolean = false
+  ): void {
     if (rememberMe) {
       localStorage.setItem(this.tokenKey, response.token);
       sessionStorage.removeItem(this.tokenKey);
@@ -154,13 +165,16 @@ export class BirthdayApiService {
       sessionStorage.setItem(this.tokenKey, response.token);
       localStorage.removeItem(this.tokenKey);
     }
-    
+
     this.currentUserSubject.next(response.user);
     this.isAuthenticatedSubject.next(true);
   }
 
   private getToken(): string | null {
-    return localStorage.getItem(this.tokenKey) || sessionStorage.getItem(this.tokenKey);
+    return (
+      localStorage.getItem(this.tokenKey) ||
+      sessionStorage.getItem(this.tokenKey)
+    );
   }
 
   private getAuthHeaders(): HttpHeaders {
@@ -175,7 +189,7 @@ export class BirthdayApiService {
     });
   }
 
-  private handleError = (error: any) => {
+  private handleError = (error: HttpErrorResponse) => {
     console.error('API Error:', error);
 
     if (error.status === 401) {

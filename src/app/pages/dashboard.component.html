@@ -300,7 +300,7 @@
     <app-friend-form
       [loading]="modalLoading()"
       (save)="onSaveFriend($event)"
-      (cancel)="hideAddModal()"
+      (formCancel)="hideAddModal()"
     ></app-friend-form>
   </ng-container>
 </nz-modal>
@@ -318,7 +318,7 @@
       [friend]="editingFriend()"
       [loading]="modalLoading()"
       (save)="onUpdateFriend($event)"
-      (cancel)="hideEditModal()"
+      (formCancel)="hideEditModal()"
     ></app-friend-form>
   </ng-container>
 </nz-modal>

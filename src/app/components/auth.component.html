@@ -49,8 +49,15 @@
                 <span
                   nz-icon
                   class="password-toggle"
+                  tabindex="0"
+                  role="button"
                   [nzType]="passwordVisible() ? 'eye-invisible' : 'eye'"
+                  [attr.aria-label]="
+                    passwordVisible() ? 'Hide password' : 'Show password'
+                  "
                   (click)="togglePasswordVisibility()"
+                  (keyup.enter)="togglePasswordVisibility()"
+                  (keyup.space)="togglePasswordVisibility()"
                 ></span>
               </ng-template>
             </nz-form-control>
@@ -58,7 +65,7 @@
 
           <nz-form-item>
             <nz-form-control [nzSpan]="24">
-              <label nz-checkbox formControlName="rememberMe"
+              <label nz-checkbox formControlName="rememberMe" for="rememberMe"
                 >Remember me</label
               >
             </nz-form-control>
@@ -182,8 +189,15 @@
                 <span
                   nz-icon
                   class="password-toggle"
+                  tabindex="0"
+                  role="button"
                   [nzType]="passwordVisible() ? 'eye-invisible' : 'eye'"
+                  [attr.aria-label]="
+                    passwordVisible() ? 'Hide password' : 'Show password'
+                  "
                   (click)="togglePasswordVisibility()"
+                  (keyup.enter)="togglePasswordVisibility()"
+                  (keyup.space)="togglePasswordVisibility()"
                 ></span>
               </ng-template>
 
